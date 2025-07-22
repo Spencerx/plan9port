@@ -18,7 +18,6 @@
 #define _Atomic volatile
 #define atomic_load(x) (*(x))
 #define atomic_store(x, y) (*(x)=(y))
-#define ATOMIC_VAR_INIT(x) (x)
 #else
 #include <stdatomic.h>
 #endif
@@ -52,9 +51,9 @@ static struct
 	Convfmt	fmt[Maxfmt];
 } fmtalloc = {
 	#ifdef PLAN9PORT
-		ATOMIC_VAR_INIT(27),
+		27,
 	#else
-		ATOMIC_VAR_INIT(30),
+		30,
 	#endif
 	{
 		{' ',	__flagfmt},
@@ -119,10 +118,10 @@ __fmtinstall(int c, Fmts f)
 	i = atomic_load(&fmtalloc.nfmt);
 	if(i == Maxfmt)
 		return -1;
-	p = &fmtalloc.fmt[i];
-	p->c = c;
-	p->fmt = f;
 	atomic_store(&fmtalloc.nfmt, i+1);
+	p = &fmtalloc.fmt[i];
+	p->fmt = f;
+	p->c = c;
 
 	return 0;
 }
